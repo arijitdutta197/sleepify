@@ -88,3 +88,191 @@ dcol8_0 = modify_rating_cols(8.0)
 dcol9_0 = modify_rating_cols(9.0)
 
 
+"""data = []
+data.append(modify_time_cols(1.0))
+data.append(modify_minute_cols(2.0))
+data.append(modify_time_cols(3.0))
+data.append(modify_hour_cols(4.0))
+data.append(modify_rating_cols(5.1))
+data.append(modify_rating_cols(5.2))
+data.append(modify_rating_cols(5.3))
+data.append(modify_rating_cols(5.4))
+data.append(modify_rating_cols(5.5))
+data.append(modify_rating_cols(5.6))
+data.append(modify_rating_cols(5.7))
+data.append(modify_rating_cols(5.8))
+data.append(modify_rating_cols(5.9))
+data.append(modify_rating_cols(6.0))
+data.append(modify_rating_cols(7.0))
+data.append(modify_rating_cols(8.0))
+data.append(modify_rating_cols(9.0))
+
+df1 = pd.DataFrame(data)
+df1 = df1.transpose()
+print(df1)"""
+##########################################################################
+#final data setting
+
+#this method converts string time to integer time for col1.0 and gives it in 24 hrs format considering person sleeps befor 6 am
+#data1 = modify_time_cols(1.0) 
+def get_hour_min_sleep_time(data1):
+    dcol=[]
+    for i in range(len(data1)):
+        ind = data1[i].index(':')
+        if ind == 1:
+            h = int(data1[i][0])
+        else:
+            h = int(data1[i][0]+data1[i][1])
+        if h == 12:
+            h = 0
+        elif h>6 and h<12:
+            h = h+12    
+        
+        if len(data1[i])-ind == 2:
+            m = 10*int(data1[i][ind+1])
+        else:
+            m = 10*int(data1[i][ind+1])+int(data1[i][ind+2])
+            
+        dcol.append([h,m])
+        #print(ind,data1[i],dcol[i],h,m)
+    #print(dcol)
+    return dcol
+
+#this method converts string time to integer time for col3.0 and gives it in 24 hrs format considering person wakes up after 3am
+#data1 = modify_time_cols(3.0) 
+def get_hour_min_awake_time(data1):
+    dcol=[]
+    for i in range(len(data1)):
+        ind=data1[i].index(':')
+        if ind == 1:
+            h = int(data1[i][0])
+        else:
+            h = int(data1[i][0]+data1[i][1])
+        if h > 12 and h<=3:
+            h = h+12
+            
+        if len(data1[i])-ind == 2:
+            m = 10*int(data1[i][ind+1])
+        else:
+            m = 10*int(data1[i][ind+1])+int(data1[i][ind+2])
+    
+        dcol.append([h,m])
+        #print(ind,data1[i],dcol[i],h,m)
+    #print(dcol)
+    return dcol
+    #print(ind,data1[i],h,m)
+
+#creating components
+c1 = dcol9_0
+def comp2(col1,col2):
+    dcol1=[]
+    dcol2=[]
+    for i in range(len(df)):
+        if col1[i] <= 15:
+            dcol1.append(0)
+        elif col1[i] > 15 and col1[i]<=30:
+            dcol1.append(1)
+        elif col1[i] > 30 and col1[i]<=60:
+            dcol1.append(2)
+        else:
+            dcol1.append(3)
+        
+        dcol2.append(dcol1[i]+col2[i])
+        #print(col1[i],col2[i],dcol1[i],dcol2[i],end=' ')
+        if dcol2[i] == 0:
+            dcol2[i] = 0
+        elif dcol2[i] == 1 or dcol2[i] == 2:
+            dcol2[i] = 1
+        elif dcol2[i] == 3 or dcol2[i] == 4:
+            dcol2[i] = 2
+        else:
+            dcol2[i] = 3
+        #print(dcol2[i],type(dcol2[i]))
+    return dcol2
+
+def comp3(col):
+    dcol=[]
+    for i in range(len(df)):
+        if col[i] > 7:
+            dcol.append(0)
+        elif col[i] > 6 and col[i] <=7:
+            dcol.append(1)
+        elif col[i] > 5 and col[i] <=6:
+            dcol.append(2)
+        else:
+            dcol.append(3)
+        #print(col[i],dcol[i])
+    return(dcol)
+def comp4(col1,col2,col3):
+    dcol1 = get_hour_min_sleep_time(col1)
+    dcol2 = get_hour_min_awake_time(col2)
+    dcol3 = []
+    for i in range(len(df)):
+        if dcol2[i][0] < dcol1[i][0]:
+            h = dcol2[i][0] + (24 - dcol1[i][0])
+        else:
+            h = dcol2[i][0] - dcol1[i][0]
+        m = round((dcol2[i][1] - dcol1[i][1])/60 ,2)
+        t = h+m
+        #h_bed.append(t)
+        sleep_eff = col3[i]/t
+        if sleep_eff >= 0.85:
+            dcol3.append(0)
+        elif sleep_eff >= 0.75 and sleep_eff < 0.85:
+            dcol3.append(1)
+        elif sleep_eff >= 0.65 and sleep_eff < 0.75:
+            dcol3.append(2)
+        else:
+            dcol3.append(3)
+    return dcol3
+        #print(dcol1[i],dcol2[i],col3[i],t,sleep_eff,dcol3[i])
+    #for i in range(len(df)):
+        #print(dcol1[i],dcol2[i],h_bed[i],)
+
+def comp5(col1, col2, col3, col4, col5, col6, col7, col8):
+    dcol = []
+    for i in range(len(df)):
+        summ = col1[i] + col2[i] + col3[i] + col4[i] + col5[i] + col6[i] + col7[i] + col8[i]
+        if summ == 0:
+            dcol.append(0)
+        elif summ > 0 and summ <= 8:
+            dcol.append(1)
+        elif summ > 8 and summ <= 16:
+            dcol.append(2)
+        else:
+            dcol.append(3)
+        #print(i,summ,dcol[i])
+    return dcol
+
+c6 = dcol6_0
+
+def comp7(col1, col2):
+    dcol = []
+    for i in range(len(df)):
+        summ = col1[i] + col2[i]
+        if summ == 0:
+            dcol.append(0)
+        elif summ > 0 and summ <= 2:
+            dcol.append(1)
+        elif summ > 2 and summ <= 4:
+            dcol.append(2)
+        else:
+            dcol.append(3)
+        #print(i,summ,dcol[i])
+    return dcol
+
+
+fin_comp = []
+fin_comp.append(dcol9_0)
+fin_comp.append(comp2(dcol2_0,dcol5_1))
+fin_comp.append(comp3(dcol4_0))
+fin_comp.append(comp4(dcol1_0,dcol3_0,dcol4_0))
+fin_comp.append(comp5(dcol5_2, dcol5_3, dcol5_4, dcol5_5, dcol5_6, dcol5_7, dcol5_8, dcol5_9))
+fin_comp.append(dcol6_0)
+fin_comp.append(comp7(dcol7_0,dcol8_0))
+fin_df = pd.DataFrame(fin_comp)
+fin_df = fin_df.transpose()
+#print(dcol6_0)
+print(fin_df.loc[0:50,])
+
+
