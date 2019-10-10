@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 
-df=pd.read_excel("test.xlsx")
+df=pd.read_excel("test2.xlsx")
 
 def modify_rating_cols(col):
     dcol=[]
@@ -272,7 +272,11 @@ fin_comp.append(dcol6_0)
 fin_comp.append(comp7(dcol7_0,dcol8_0))
 fin_df = pd.DataFrame(fin_comp)
 fin_df = fin_df.transpose()
+fin_df.columns = ['C1','C2','C3','C4','C5','C6','C7']
 #print(dcol6_0)
-print(fin_df.loc[0:50,])
+print(fin_df.loc[0:,])
+#comps = fin_df.to_excel (r'/home/arijit/sleepify', index = None, header=True)
+outputFile = "comps.xlsx"
+fin_df.to_excel(outputFile, index=None, header=True)
 
 
