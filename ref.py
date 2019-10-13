@@ -261,6 +261,24 @@ def comp7(col1, col2):
         #print(i,summ,dcol[i])
     return dcol
 
+def gpsqi_col(fin_comps):
+    l=[]
+    for i in range(len(df)):
+        l.append(fin_comp[0][i]+fin_comp[1][i]+fin_comp[2][i]+fin_comp[3][i]+fin_comp[4][i]+fin_comp[5][i]+fin_comp[6][i])
+    return l
+
+def my_score_col(gpsqi):
+    l=[]
+    for sc in gpsqi:
+        if sc<=5:
+            l.append(1)
+        elif sc>5 and sc<=10:
+            l.append(2)
+        elif sc>10 and sc<=15:
+            l.append(3)
+        else:
+            l.append(4)
+    return l
 
 fin_comp = []
 fin_comp.append(dcol9_0)
@@ -270,13 +288,19 @@ fin_comp.append(comp4(dcol1_0,dcol3_0,dcol4_0))
 fin_comp.append(comp5(dcol5_2, dcol5_3, dcol5_4, dcol5_5, dcol5_6, dcol5_7, dcol5_8, dcol5_9))
 fin_comp.append(dcol6_0)
 fin_comp.append(comp7(dcol7_0,dcol8_0))
+fin_comp.append(gpsqi_col(fin_comp))
+#l=gpsqi_col(fin_comp)
+fin_comp.append(my_score_col(fin_comp[7]))
+#fin_comp.insert(0,my_score_col(l))
+
 fin_df = pd.DataFrame(fin_comp)
 fin_df = fin_df.transpose()
-fin_df.columns = ['C1','C2','C3','C4','C5','C6','C7']
+fin_df.columns = ['C1','C2','C3','C4','C5','C6','C7','C8','C9']
+#fin_df.columns = ['C1','C2','C3','C4','C5','C6','C7','C8']
 #print(dcol6_0)
 print(fin_df.loc[0:,])
 #comps = fin_df.to_excel (r'/home/arijit/sleepify', index = None, header=True)
 outputFile = "comps.xlsx"
-fin_df.to_excel(outputFile, index=None, header=True)
-
+#fin_df.to_excel(outputFile, index=None, header=True)
+fin_df.to_csv("comps.csv", index=None, header=False)
 
